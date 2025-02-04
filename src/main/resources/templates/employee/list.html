@@ -98,10 +98,12 @@
 
           <!-- ここにモックのtable要素を貼り付けます -->
           
-          名前：<input type="text" name="name">
+          
+          <form method="get" th:action="@{/employee/search}">
+            名前：<input type="text" name="name">
           <button>検索</button> <br> 
           <br>
-
+          </form>
           <table class="table table-striped">
             <thead>
               <tr>
