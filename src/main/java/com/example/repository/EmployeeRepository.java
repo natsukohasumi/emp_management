@@ -1,6 +1,8 @@
 package com.example.repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -55,6 +57,18 @@ public class EmployeeRepository {
 		List<Employee> developmentList = template.query(sql, EMPLOYEE_ROW_MAPPER);
 
 		return developmentList;
+	}
+
+	// 従業員名検索
+
+	public List<Employee> findObject(String name) {
+		String sql = "SELECT id,name,image,gender,hire_date,mail_address,zip_code,address,telephone,salary,characteristics,dependents_count FROM employees WHERE name LIKE :name";
+    	String likelyName= "%" + name + "%";
+		MapSqlParameterSource params = new MapSqlParameterSource();
+    	params.addValue("name", likelyName );
+		List<Employee> searchList = template.query(sql, params, EMPLOYEE_ROW_MAPPER);
+
+		return searchList;
 	}
 
 	/**
