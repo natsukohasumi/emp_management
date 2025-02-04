@@ -3,6 +3,9 @@ package com.example.controller;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.domain.Administrator;
 import com.example.form.InsertAdministratorForm;
 import com.example.form.LoginForm;
+import com.example.repository.AdministratorRepository;
 import com.example.service.AdministratorService;
 
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +35,9 @@ public class AdministratorController {
 
 	@Autowired
 	private HttpSession session;
+
+	@Autowired
+	private AdministratorRepository repository;
 
 	/**
 	 * 使用するフォームオブジェクトをリクエストスコープに格納する.
@@ -72,7 +79,16 @@ public class AdministratorController {
 	 * @return ログイン画面へリダイレクト
 	 */
 	@PostMapping("/insert")
-	public String insert(InsertAdministratorForm form) {
+	public String insert(@Validated InsertAdministratorForm form
+						, BindingResult result
+						, Model model) {
+		if(repository.findByMailAddress(form.getMailAddress()) != null){
+			result.rejectValue("mailAddress", "error.duplicate", "メールアドレスが重複しています");
+		}
+		
+		if(result.hasErrors()){
+			return toInsert();
+		}
 		Administrator administrator = new Administrator();
 		// フォームからドメインにプロパティ値をコピー
 		BeanUtils.copyProperties(form, administrator);
